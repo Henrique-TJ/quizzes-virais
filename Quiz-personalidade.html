@@ -2,6 +2,8 @@
 <html lang="pt-br">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Personalidade</title>
 
 <style>
@@ -10,8 +12,15 @@ body {
     background: linear-gradient(135deg, #ff758c, #ff7eb3);
     text-align: center;
     color: white;
-    padding: 30px;
+    padding: 20px;
+    margin: 0;
+    box-sizing: border-box;
     padding-bottom: 90px;
+}
+
+h1 {
+    font-size: 22px;
+    padding: 0 10px;
 }
 
 .box {
@@ -20,17 +29,23 @@ body {
     padding: 20px;
     border-radius: 10px;
     max-width: 400px;
+    width: 100%;
     margin: auto;
 }
 
 button {
     width: 100%;
     margin: 10px 0;
-    padding: 12px;
+    padding: 14px;
     background: #e91e63;
     color: white;
     border: none;
     border-radius: 8px;
+    font-size: 16px;
+}
+
+button:hover {
+    opacity: 0.9;
 }
 </style>
 </head>
@@ -64,37 +79,53 @@ const quiz = [
     }
 ];
 
-let current=0,score=0;
+let current = 0;
+let score = 0;
 
 function loadQuestion(){
-    let q=quiz[current];
-    question.innerText=q.question;
-    answers.innerHTML="";
+    let q = quiz[current];
+    question.innerText = q.question;
+    answers.innerHTML = "";
 
     q.answers.forEach((a,i)=>{
-        let b=document.createElement("button");
-        b.innerText=a;
-        b.onclick=()=>{
-            score+=q.points[i];
+        let b = document.createElement("button");
+        b.innerText = a;
+        b.onclick = () => {
+            score += q.points[i];
             current++;
-            current<quiz.length?loadQuestion():showResult();
+            current < quiz.length ? loadQuestion() : showResult();
         }
         answers.appendChild(b);
     });
 }
 
 function showResult(){
-    let r = score<=4?"🌿 Tranquila e observadora":score<=7?"😊 Sociável e equilibrada":"🔥 Aventureira e cheia de energia";
+    let r = score <= 4 ? "🌿 Tranquila e observadora"
+        : score <= 7 ? "😊 Sociável e equilibrada"
+        : "🔥 Aventureira e cheia de energia";
 
-    question.style.display="none";
-    answers.style.display="none";
-    result.innerHTML = `${r}
-    <br><br><button onclick="share()">📲 Compartilhar</button>`;
+    question.style.display = "none";
+    answers.style.display = "none";
+
+    result.innerHTML = `
+        ${r}
+        <br><br>
+        <button onclick="share()">📲 Compartilhar</button>
+    `;
 }
 
 function share(){
-    window.open(`https://wa.me/?text=${encodeURIComponent("Fiz o teste de personalidade!")}`);
+    window.open(
+        `https://wa.me/?text=${encodeURIComponent("Fiz o teste de personalidade!")}`
+    );
 }
 
 loadQuestion();
 </script>
+
+<div style="position:fixed;bottom:0;left:0;width:100%;background:#eee;padding:10px;font-size:14px;">
+🔵 Espaço para anúncio
+</div>
+
+</body>
+</html>
