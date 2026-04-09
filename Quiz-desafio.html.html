@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Desafio</title>
+
+<style>
+body {
+    font-family: Arial;
+    background: linear-gradient(135deg, #ff512f, #dd2476);
+    text-align: center;
+    color: white;
+    padding: 30px;
+    padding-bottom: 90px;
+}
+
+.box {
+    background: white;
+    color: black;
+    padding: 20px;
+    border-radius: 10px;
+    max-width: 400px;
+    margin: auto;
+}
+
+button {
+    width: 100%;
+    margin: 10px 0;
+    padding: 12px;
+    background: #ff5722;
+    color: white;
+    border: none;
+    border-radius: 8px;
+}
+</style>
+</head>
+
+<body>
+
+<h1>🔥 Só 1% acerta tudo!</h1>
+
+<div class="box">
+    <h2 id="question">Carregando...</h2>
+    <div id="answers"></div>
+    <h3 id="result"></h3>
+</div>
+
+<script>
+const quiz = [
+    {
+        question: "Qual número vem depois: 1, 3, 6, 10, ?",
+        answers: ["12","13","15","14"],
+        correct: 2
+    },
+    {
+        question: "Se você tem 3 maçãs e pega mais 2, com quantas fica?",
+        answers: ["3","5","2","4"],
+        correct: 1
+    },
+    {
+        question: "O que pesa mais: 1kg de ferro ou 1kg de algodão?",
+        answers: ["Ferro","Algodão","Igual","Depende"],
+        correct: 2
+    }
+];
+
+let current=0,score=0;
+
+function loadQuestion(){
+    let q=quiz[current];
+    question.innerText=q.question;
+    answers.innerHTML="";
+
+    q.answers.forEach((a,i)=>{
+        let b=document.createElement("button");
+        b.innerText=a;
+        b.onclick=()=>{
+            if(i===q.correct) score++;
+            current++;
+            current<quiz.length?loadQuestion():showResult();
+        }
+        answers.appendChild(b);
+    });
+}
+
+function showResult(){
+    let r = score==3?"🔥 Você está entre o 1%!":score==2?"👏 Quase lá!":"😅 Tente novamente";
+
+    question.style.display="none";
+    answers.style.display="none";
+    result.innerHTML = `Você acertou ${score}/3<br>${r}
+    <br><br><button onclick="share()">📲 Compartilhar</button>`;
+}
+
+function share(){
+    window.open(`https://wa.me/?text=${encodeURIComponent("Tentei o desafio!")}`);
+}
+
+loadQuestion();
+</script>
+
+<div style="position:fixed;bottom:0;width:100%;background:#eee;padding:10px;">
+🔵 Espaço para anúncio
+</div>
+
+</body>
+</html>

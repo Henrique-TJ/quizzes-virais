@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Personalidade</title>
+
+<style>
+body {
+    font-family: Arial;
+    background: linear-gradient(135deg, #ff758c, #ff7eb3);
+    text-align: center;
+    color: white;
+    padding: 30px;
+    padding-bottom: 90px;
+}
+
+.box {
+    background: white;
+    color: black;
+    padding: 20px;
+    border-radius: 10px;
+    max-width: 400px;
+    margin: auto;
+}
+
+button {
+    width: 100%;
+    margin: 10px 0;
+    padding: 12px;
+    background: #e91e63;
+    color: white;
+    border: none;
+    border-radius: 8px;
+}
+</style>
+</head>
+
+<body>
+
+<h1>❤️ Que tipo de pessoa você é?</h1>
+
+<div class="box">
+    <h2 id="question">Carregando...</h2>
+    <div id="answers"></div>
+    <h3 id="result"></h3>
+</div>
+
+<script>
+const quiz = [
+    {
+        question: "Você prefere:",
+        answers: ["Ficar em casa", "Sair com amigos", "Explorar lugares novos"],
+        points: [1,2,3]
+    },
+    {
+        question: "Como reage a problemas?",
+        answers: ["Penso bastante", "Peço ajuda", "Resolvo rápido"],
+        points: [1,2,3]
+    },
+    {
+        question: "O que mais te define?",
+        answers: ["Calmo", "Sociável", "Aventureiro"],
+        points: [1,2,3]
+    }
+];
+
+let current=0,score=0;
+
+function loadQuestion(){
+    let q=quiz[current];
+    question.innerText=q.question;
+    answers.innerHTML="";
+
+    q.answers.forEach((a,i)=>{
+        let b=document.createElement("button");
+        b.innerText=a;
+        b.onclick=()=>{
+            score+=q.points[i];
+            current++;
+            current<quiz.length?loadQuestion():showResult();
+        }
+        answers.appendChild(b);
+    });
+}
+
+function showResult(){
+    let r = score<=4?"🌿 Tranquila e observadora":score<=7?"😊 Sociável e equilibrada":"🔥 Aventureira e cheia de energia";
+
+    question.style.display="none";
+    answers.style.display="none";
+    result.innerHTML = `${r}
+    <br><br><button onclick="share()">📲 Compartilhar</button>`;
+}
+
+function share(){
+    window.open(`https://wa.me/?text=${encodeURIComponent("Fiz o teste de personalidade!")}`);
+}
+
+loadQuestion();
+</script>
