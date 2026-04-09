@@ -2,6 +2,8 @@
 <html lang="pt-br">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Teste de Inteligência</title>
 
 <style>
@@ -10,8 +12,15 @@ body {
     background: linear-gradient(135deg, #667eea, #764ba2);
     text-align: center;
     color: white;
-    padding: 30px;
+    padding: 20px;
+    margin: 0;
+    box-sizing: border-box;
     padding-bottom: 90px;
+}
+
+h1 {
+    font-size: 22px;
+    padding: 0 10px;
 }
 
 .box {
@@ -20,17 +29,23 @@ body {
     padding: 20px;
     border-radius: 10px;
     max-width: 400px;
+    width: 100%;
     margin: auto;
 }
 
 button {
     width: 100%;
     margin: 10px 0;
-    padding: 12px;
+    padding: 14px;
     background: #667eea;
     color: white;
     border: none;
     border-radius: 8px;
+    font-size: 16px;
+}
+
+button:hover {
+    opacity: 0.9;
 }
 </style>
 </head>
@@ -64,42 +79,49 @@ const quiz = [
     }
 ];
 
-let current=0,score=0;
+let current = 0;
+let score = 0;
 
 function loadQuestion(){
-    let q=quiz[current];
-    question.innerText=q.question;
-    answers.innerHTML="";
+    let q = quiz[current];
+    question.innerText = q.question;
+    answers.innerHTML = "";
 
     q.answers.forEach((a,i)=>{
-        let b=document.createElement("button");
-        b.innerText=a;
-        b.onclick=()=>{
-            if(i===q.correct) score++;
+        let b = document.createElement("button");
+        b.innerText = a;
+        b.onclick = () => {
+            if(i === q.correct) score++;
             current++;
-            current<quiz.length?loadQuestion():showResult();
+            current < quiz.length ? loadQuestion() : showResult();
         }
         answers.appendChild(b);
     });
 }
 
 function showResult(){
-    let r = score<=1?"😅 Abaixo da média":score==2?"🙂 Na média":"🔥 Acima da média!";
+    let r = score <= 1 ? "😅 Abaixo da média" : score == 2 ? "🙂 Na média" : "🔥 Acima da média!";
 
-    question.style.display="none";
-    answers.style.display="none";
-    result.innerHTML = `Você acertou ${score}/3<br><br>${r}
-    <br><br><button onclick="share()">📲 Compartilhar</button>`;
+    question.style.display = "none";
+    answers.style.display = "none";
+
+    result.innerHTML = `
+        Você acertou ${score}/3<br><br>${r}
+        <br><br>
+        <button onclick="share()">📲 Compartilhar</button>
+    `;
 }
 
 function share(){
-    window.open(`https://wa.me/?text=${encodeURIComponent("Fiz o teste de inteligência!")}`);
+    window.open(
+        `https://wa.me/?text=${encodeURIComponent("Fiz o teste de inteligência!")}`
+    );
 }
 
 loadQuestion();
 </script>
 
-<div style="position:fixed;bottom:0;width:100%;background:#eee;padding:10px;">
+<div style="position:fixed;bottom:0;left:0;width:100%;background:#eee;padding:10px;font-size:14px;">
 🔵 Espaço para anúncio
 </div>
 
