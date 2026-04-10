@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Minecraft PC + Mobile</title>
+
+<style>
+body { margin:0; overflow:hidden; font-family:Arial; touch-action:none; }
+
+/* CROSSHAIR */
+#crosshair {
+position:absolute; top:50%; left:50%;
+width:12px; height:12px;
+transform:translate(-50%,-50%);
+}
+#crosshair::before,#crosshair::after{
+content:""; position:absolute; background:white;
+}
+#crosshair::before{ width:12px;height:2px;top:5px;}
+#crosshair::after{ width:2px;height:12px;left:5px;}
+
+/* HOTBAR */
+#hotbar {
+position:absolute;
+bottom:20px;
+left:50%;
+transform:translateX(-50%);
+display:flex;
+gap:4px;
+background:rgba(0,0,0,0.6);
+padding:6px;
+border-radius:10px;
+}
+.slot {
+width:50px;height:50px;
+border:2px solid #555;
+display:flex;
+align-items:center;
+justify-content:center;
+}
+.slot.active { border:3px solid white; transform:scale(1.1); }
+.blockColor { width:32px;height:32px;border:1px solid #000; }
+
+/* MOBILE CONTROLS */
+#mobile { display:none; }
+
+.btn {
+width:50px;height:50px;
+background:rgba(0,0,0,0.5);
+color:white;
+display:flex;
+align-items:center;
+justify-content:center;
+border-radius:8px;
+}
+
+#move {
+position:absolute;
+bottom:100px;
+left:20px;
+display:flex;
+flex-direction:column;
+gap:5px;
+}
+
+.row { display:flex; gap:5px; }
+
+#actions {
+position:absolute;
+bottom:100px;
+right:20px;
+display:flex;
+flex-direction:column;
+gap:10px;
+}
+</style>
+</head>
+
+<body>
+
+<div id="crosshair"></div>
+<div id="hotbar"></div>
+
+<!-- MOBILE -->
+<div id="mobile">
+<div id="move">
+  <div class="row"><div class="btn" id="up">▲</div></div>
+  <div class="row">
+    <div class="btn" id="left">◀</div>
+    <div class="btn" id="down">▼</div>
+    <div class="btn" id="right">▶</div>
+  </div>
+</div>
+
+<div id="actions">
+  <div class="btn" id="jump">⤒</div>
+  <div class="btn" id="placeBtn">＋</div>
+</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+
+<script>
+
+// detectar mobile
+let isMobile = /Mobi|Android/i.test(navigator.userAgent);
+if(isMobile) document.getElementById("mobile").style.display="block";
+
+// cena
+let scene=new THREE.Scene();
+scene.background=new THREE.Color(0x87ceeb);
+
+let camera=new THREE.PerspectiveCamera(75,innerWidth/innerHeight,0.1,1000);
+let renderer=new THREE.WebGLRenderer();
+renderer.setSize(innerWidth,innerHeight);
+document.body.appendChild(renderer.domElement);
+
+let light=new THREE.DirectionalLight(0xffffff,1);
+light.position.set(10,20,10);
+scene.add(light);
+
+let player=new THREE.Object3D();
+player.position.y=6;
+scene.add(player);
+player.add(camera);
+
+let geo=new THREE.BoxGeometry(1,1,1);
+let blocks=[];
+
+// materiais
+let materials = [
+new THREE.MeshLambertMaterial({color:0x3fa34d}),
+new THREE.MeshLambertMaterial({color:0x8B4513}),
+new THREE.MeshLambertMaterial({color:0x808080}),
+new THREE.MeshLambertMaterial({color:0xff0000}),
+new THREE.MeshLambertMaterial({color:0x0000ff}),
+new THREE.MeshLambertMaterial({color:0xffff00}),
+new THREE.MeshLambertMaterial({color:0x00ffff}),
+new THREE.MeshLambertMaterial({color:0xff00ff}),
+new THREE.MeshLambertMaterial({color:0xffffff})
+];
+
+// mundo
+for(let x=-15;x<15;x++){
+for(let z=-15;z<15;z++){
+for(let y=0;y<5;y++){
+let mat = y===4 ? materials[0] : y>=2 ? materials[1] : materials[2];
+let b=new THREE.Mesh(geo,mat);
+b.position.set(x,y,z);
+b.userData.placed=false;
+scene.add(b);
+blocks.push(b);
+}
+}
+}
+
+// hotbar
+let selected=0;
+function updateHotbar(){
+hotbar.innerHTML="";
+materials.forEach((m,i)=>{
+let d=document.createElement("div");
+d.className="slot"+(i===selected?" active":"");
+let c=document.createElement("div");
+c.className="blockColor";
+c.style.background=m.color.getStyle();
+d.appendChild(c);
+hotbar.appendChild(d);
+});
+}
+updateHotbar();
+
+// scroll + teclas
+addEventListener("wheel",(e)=>{
+selected += (e.deltaY>0?1:-1);
+if(selected<0) selected=8;
+if(selected>8) selected=0;
+updateHotbar();
+});
+
+addEventListener("keydown",(e)=>{
+let n=parseInt(e.key);
+if(n>=1 && n<=9){ selected=n-1; updateHotbar(); }
+});
+
+// teclado PC
+let keys={};
+addEventListener("keydown",e=>keys[e.code]=true);
+addEventListener("keyup",e=>keys[e.code]=false);
+
+// mouse look (PC)
+if(!isMobile){
+document.body.onclick=()=>document.body.requestPointerLock();
+
+addEventListener("mousemove",e=>{
+if(document.pointerLockElement!==document.body) return;
+player.rotation.y -= e.movementX*0.002;
+camera.rotation.x -= e.movementY*0.002;
+});
+}
+
+// mobile controles
+let move={w:false,a:false,s:false,d:false,jump:false};
+
+if(isMobile){
+function bind(id,key){
+let el=document.getElementById(id);
+el.ontouchstart=()=>move[key]=true;
+el.ontouchend=()=>move[key]=false;
+}
+bind("up","w");
+bind("down","s");
+bind("left","a");
+bind("right","d");
+jump.ontouchstart=()=>move.jump=true;
+jump.ontouchend=()=>move.jump=false;
+placeBtn.onclick=placeBlock;
+
+// tocar = quebrar
+renderer.domElement.ontouchstart=()=>breaking=true;
+renderer.domElement.ontouchend=()=>breaking=false;
+}
+
+// física
+let vy=0;
+let raycaster=new THREE.Raycaster();
+let breaking=false;
+let progress=0;
+
+// mouse PC
+if(!isMobile){
+addEventListener("mousedown",e=>{
+if(e.button===0) breaking=true;
+if(e.button===2) placeBlock();
+});
+addEventListener("mouseup",()=>breaking=false);
+addEventListener("contextmenu",e=>e.preventDefault());
+}
+
+// colocar bloco
+function placeBlock(){
+raycaster.setFromCamera(new THREE.Vector2(0,0),camera);
+let hit=raycaster.intersectObjects(blocks);
+if(!hit.length) return;
+
+let pos=hit[0].object.position.clone().add(hit[0].face.normal);
+
+let b=new THREE.Mesh(geo,materials[selected]);
+b.position.set(Math.round(pos.x),Math.round(pos.y),Math.round(pos.z));
+b.userData.placed=true;
+
+scene.add(b);
+blocks.push(b);
+}
+
+// loop
+function loop(){
+requestAnimationFrame(loop);
+
+// movimento
+let speed=0.12;
+
+if(keys["KeyW"]||move.w) player.translateZ(-speed);
+if(keys["KeyS"]||move.s) player.translateZ(speed);
+if(keys["KeyA"]||move.a) player.translateX(-speed);
+if(keys["KeyD"]||move.d) player.translateX(speed);
+
+// gravidade
+vy-=0.01;
+player.position.y+=vy;
+if(player.position.y<6){ player.position.y=6; vy=0; }
+
+if((keys["Space"]||move.jump) && vy===0) vy=0.18;
+
+// raycast
+raycaster.setFromCamera(new THREE.Vector2(0,0),camera);
+let hit=raycaster.intersectObjects(blocks);
+
+if(hit.length && breaking){
+progress++;
+if(progress>15){
+let obj=hit[0].object;
+if(obj.userData.placed){
+scene.remove(obj);
+blocks=blocks.filter(b=>b!==obj);
+}
+progress=0;
+}
+}else{
+progress=0;
+}
+
+renderer.render(scene,camera);
+}
+loop();
+
+</script>
+</body>
+</html>
