@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Block Blast Completo</title>
+
+<style>
+body {
+  font-family: Arial;
+  background: #111;
+  color: white;
+  text-align: center;
+}
+
+h1 { margin-top: 10px; }
+
+#board {
+  display: grid;
+  grid-template-columns: repeat(8, 45px);
+  grid-template-rows: repeat(8, 45px);
+  gap: 3px;
+  margin: 20px auto;
+  width: fit-content;
+}
+
+.cell {
+  width: 45px;
+  height: 45px;
+  background: #222;
+  border-radius: 5px;
+}
+
+.cell.filled {
+  background: #00d4ff;
+}
+
+#pieces {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.piece {
+  cursor: grab;
+}
+
+.piece-grid {
+  display: grid;
+  gap: 2px;
+}
+
+.block {
+  width: 20px;
+  height: 20px;
+  background: #00d4ff;
+}
+</style>
+</head>
+
+<body>
+
+<h1>Block Blast</h1>
+<div id="score">Score: 0</div>
+
+<div id="board"></div>
+<div id="pieces"></div>
+
+<script>
+const size = 8;
+let grid = Array(size * size).fill(0);
+let score = 0;
+
+const board = document.getElementById("board");
+const piecesDiv = document.getElementById("pieces");
+const scoreEl = document.getElementById("score");
+
+let selectedShape = null;
+let selectedPieceEl = null;
+
+// ---------------- TABULEIRO ----------------
+function drawBoard() {
+  board.innerHTML = "";
+
+  grid.forEach((cell, i) => {
+    const div = document.createElement("div");
+    div.className = "cell";
+    if (cell) div.classList.add("filled");
+
+    div.dataset.index = i;
+
+    div.addEventListener("dragover", e => e.preventDefault());
+
+    div.addEventListener("drop", e => {
+      e.preventDefault();
+      if (!selectedShape) return;
+
+      const index = parseInt(div.dataset.index);
+      const x = index % size;
+      const y = Math.floor(index / size);
+
+      if (!canPlace(selectedShape, x, y)) return;
+
+      placeShape(selectedShape, x, y);
+
+      score += 10;
+      scoreEl.innerText = "Score: " + score;
+
+      checkLines();
+
+      if (selectedPieceEl) {
+        selectedPieceEl.remove();
+      }
+
+      selectedShape = null;
+      selectedPieceEl = null;
+
+      if (piecesDiv.children.length === 0) {
+        loadPieces();
+      }
+
+      drawBoard();
+    });
+
+    board.appendChild(div);
+  });
+}
+
+// ---------------- LÓGICA ----------------
+function canPlace(shape, x, y) {
+  for (let i = 0; i < shape.length; i++) {
+    for (let j = 0; j < shape[i].length; j++) {
+      if (shape[i][j]) {
+        const nx = x + j;
+        const ny = y + i;
+
+        if (nx >= size || ny >= size) return false;
+        if (grid[ny * size + nx]) return false;
+      }
+    }
+  }
+  return true;
+}
+
+function placeShape(shape, x, y) {
+  for (let i = 0; i < shape.length; i++) {
+    for (let j = 0; j < shape[i].length; j++) {
+      if (shape[i][j]) {
+        const nx = x + j;
+        const ny = y + i;
+
+        grid[ny * size + nx] = 1;
+      }
+    }
+  }
+}
+
+// ---------------- LIMPAR LINHAS + COLUNAS ----------------
+function checkLines() {
+  // LINHAS
+  for (let y = 0; y < size; y++) {
+    let full = true;
+
+    for (let x = 0; x < size; x++) {
+      if (!grid[y * size + x]) {
+        full = false;
+        break;
+      }
+    }
+
+    if (full) {
+      for (let x = 0; x < size; x++) {
+        grid[y * size + x] = 0;
+      }
+      score += 50;
+    }
+  }
+
+  // COLUNAS
+  for (let x = 0; x < size; x++) {
+    let full = true;
+
+    for (let y = 0; y < size; y++) {
+      if (!grid[y * size + x]) {
+        full = false;
+        break;
+      }
+    }
+
+    if (full) {
+      for (let y = 0; y < size; y++) {
+        grid[y * size + x] = 0;
+      }
+      score += 50;
+    }
+  }
+}
+
+// ---------------- PEÇAS ----------------
+const shapes = [
+  [[1,1,1]],
+  [[1,1],[1,1]],
+  [[1],[1],[1]],
+  [[1,1,1],[0,1,0]],
+  [[1,1,1,1]],
+  [[1,0,0],[1,1,1]],
+];
+
+// ---------------- CRIAR PEÇA ----------------
+function createPiece(shape) {
+  const wrapper = document.createElement("div");
+  wrapper.className = "piece";
+
+  const rows = shape.length;
+  const cols = shape[0].length;
+
+  const gridDiv = document.createElement("div");
+  gridDiv.className = "piece-grid";
+  gridDiv.style.gridTemplateColumns = `repeat(${cols}, 20px)`;
+
+  for (let i = 0; i < rows; i++) {
+    for (let j = 0; j < cols; j++) {
+      const cell = document.createElement("div");
+
+      if (shape[i][j]) {
+        cell.className = "block";
+      } else {
+        cell.style.width = "20px";
+        cell.style.height = "20px";
+        cell.style.opacity = "0";
+      }
+
+      gridDiv.appendChild(cell);
+    }
+  }
+
+  wrapper.appendChild(gridDiv);
+
+  wrapper.draggable = true;
+
+  wrapper.addEventListener("dragstart", () => {
+    selectedShape = shape;
+    selectedPieceEl = wrapper;
+  });
+
+  return wrapper;
+}
+
+// ---------------- CARREGAR PEÇAS ----------------
+function loadPieces() {
+  piecesDiv.innerHTML = "";
+
+  for (let i = 0; i < 3; i++) {
+    const shape = shapes[Math.floor(Math.random() * shapes.length)];
+    piecesDiv.appendChild(createPiece(shape));
+  }
+}
+
+// ---------------- INICIAR ----------------
+drawBoard();
+loadPieces();
+</script>
+
+</body>
+</html>
