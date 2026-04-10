@@ -2,8 +2,8 @@
 <html lang="pt-br">
 <head>
 <meta charset="UTF-8">
-<title>Mainecraft</title>
- <div class="ad">🔵 Espaço para anúncio</div>
+<title>Minecraft PC + Mobile</title>
+
 <style>
 body { margin:0; overflow:hidden; font-family:Arial; touch-action:none; }
 
@@ -41,7 +41,7 @@ justify-content:center;
 .slot.active { border:3px solid white; transform:scale(1.1); }
 .blockColor { width:32px;height:32px;border:1px solid #000; }
 
-/* MOBILE CONTROLS */
+/* MOBILE */
 #mobile { display:none; }
 
 .btn {
@@ -170,7 +170,7 @@ hotbar.appendChild(d);
 }
 updateHotbar();
 
-// scroll + teclas
+// scroll + teclado
 addEventListener("wheel",(e)=>{
 selected += (e.deltaY>0?1:-1);
 if(selected<0) selected=8;
@@ -188,21 +188,25 @@ let keys={};
 addEventListener("keydown",e=>keys[e.code]=true);
 addEventListener("keyup",e=>keys[e.code]=false);
 
-// mouse look (PC)
+// mouse PC
 if(!isMobile){
 document.body.onclick=()=>document.body.requestPointerLock();
 
 addEventListener("mousemove",e=>{
 if(document.pointerLockElement!==document.body) return;
+
 player.rotation.y -= e.movementX*0.002;
 camera.rotation.x -= e.movementY*0.002;
+
+camera.rotation.x = Math.max(-1.5, Math.min(1.5, camera.rotation.x));
 });
 }
 
-// mobile controles
+// MOBILE CONTROLES
 let move={w:false,a:false,s:false,d:false,jump:false};
 
 if(isMobile){
+
 function bind(id,key){
 let el=document.getElementById(id);
 el.ontouchstart=()=>move[key]=true;
@@ -212,11 +216,37 @@ bind("up","w");
 bind("down","s");
 bind("left","a");
 bind("right","d");
+
 jump.ontouchstart=()=>move.jump=true;
 jump.ontouchend=()=>move.jump=false;
+
 placeBtn.onclick=placeBlock;
 
-// tocar = quebrar
+// 🔥 TOUCH CAMERA (NOVO)
+let lastX=0, lastY=0;
+let sensitivity=0.005;
+
+renderer.domElement.addEventListener("touchstart",(e)=>{
+lastX = e.touches[0].clientX;
+lastY = e.touches[0].clientY;
+});
+
+renderer.domElement.addEventListener("touchmove",(e)=>{
+
+let dx = e.touches[0].clientX - lastX;
+let dy = e.touches[0].clientY - lastY;
+
+lastX = e.touches[0].clientX;
+lastY = e.touches[0].clientY;
+
+player.rotation.y -= dx * sensitivity;
+camera.rotation.x -= dy * sensitivity;
+
+camera.rotation.x = Math.max(-1.5, Math.min(1.5, camera.rotation.x));
+
+});
+
+// toque = quebrar
 renderer.domElement.ontouchstart=()=>breaking=true;
 renderer.domElement.ontouchend=()=>breaking=false;
 }
