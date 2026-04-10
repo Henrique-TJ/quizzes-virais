@@ -7,92 +7,140 @@
 <title>gamestotion</title>
 
 <style>
-    body {
-        font-family: Arial, sans-serif;
-        background: linear-gradient(135deg, #667eea, #764ba2);
-        color: white;
-        text-align: center;
-        padding: 20px;
-        margin: 0;
-        box-sizing: border-box;
-    }
+body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    text-align: center;
+    margin: 0;
+    overflow-x: hidden;
+}
 
-    .container {
-        max-width: 900px;
-        margin: auto;
-    }
+/* ================= START SCREEN ================= */
+.start-screen {
+    position: fixed;
+    width: 100%;
+    height: 100vh;
+    background: linear-gradient(135deg, #111, #222);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+}
 
-    h1 {
-        margin-bottom: 20px;
-        font-size: 24px;
-    }
+.start-screen h1 {
+    font-size: 32px;
+    margin-bottom: 10px;
+}
 
-    p {
-        font-size: 16px;
-    }
+.start-screen p {
+    opacity: 0.8;
+    margin-bottom: 20px;
+}
 
-    .buttons {
-        display: flex;
-        justify-content: center;
-        gap: 20px;
-        flex-wrap: wrap;
-        padding: 10px;
-    }
+.start-btn {
+    padding: 15px 30px;
+    font-size: 18px;
+    border: none;
+    border-radius: 10px;
+    background: #00d4ff;
+    color: black;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
 
-    .card {
-        background: white;
-        color: #333;
-        padding: 20px;
-        border-radius: 12px;
-        width: 100%;
-        max-width: 250px;
-        box-shadow: 0 0 15px rgba(0,0,0,0.2);
-        margin-bottom: 15px;
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
+.start-btn:hover {
+    transform: scale(1.05);
+}
 
-    .card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-    }
+/* ================= CONTEÚDO ================= */
+.container {
+    max-width: 900px;
+    margin: auto;
+    padding: 20px;
+    display: none; /* começa escondido */
+}
 
-    .btn {
-        display: block;
-        margin-top: 15px;
-        padding: 12px;
-        border-radius: 8px;
-        text-decoration: none;
-        font-weight: bold;
-        color: white;
-    }
+h1 {
+    margin-bottom: 20px;
+    font-size: 24px;
+}
 
-    .inteligencia { background: #667eea; }
-    .personalidade { background: #e91e63; }
-    .desafio { background: #ff5722; }
+p {
+    font-size: 16px;
+}
 
-    .btn:hover {
-        opacity: 0.9;
-    }
+.buttons {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    padding: 10px;
+}
 
-    .ad {
-        margin: 30px 0;
-        background: white;
-        color: black;
-        padding: 10px;
-        border-radius: 8px;
-        font-size: 14px;
-    }
+.card {
+    background: white;
+    color: #333;
+    padding: 20px;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 250px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.2);
+    margin-bottom: 15px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+}
+
+.btn {
+    display: block;
+    margin-top: 15px;
+    padding: 12px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: bold;
+    color: white;
+}
+
+.inteligencia { background: #667eea; }
+.personalidade { background: #e91e63; }
+.desafio { background: #ff5722; }
+
+.btn:hover {
+    opacity: 0.9;
+}
+
+.ad {
+    margin: 30px 0;
+    background: white;
+    color: black;
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 14px;
+}
 </style>
 </head>
 
 <body>
 
-<div class="container">
+<!-- ================= START SCREEN ================= -->
+<div class="start-screen" id="startScreen">
+    <h1>GAMESTOTION</h1>
+
+    <button class="start-btn" onclick="start()">COMEÇAR</button>
+</div>
+
+<!-- ================= CONTEÚDO ================= -->
+<div class="container" id="mainContent">
 
     <h1>Jogos e Desafios TOP</h1>
     <p>Se divirta, aprenda algo sobre você e COMPARTILHE com seus amigos</p>
 
-    <!-- ANÚNCIO TOPO -->
     <div class="ad">🔵 Espaço para anúncio</div>
 
     <div class="buttons">
@@ -115,10 +163,18 @@
             <a href="Quiz-desafio.html" class="btn desafio">Começar agora</a>
         </div>
 
-    <!-- ANÚNCIO FINAL -->
+    </div>
+
     <div class="ad">🔵 Espaço para anúncio</div>
 
 </div>
+
+<script>
+function start() {
+    document.getElementById("startScreen").style.display = "none";
+    document.getElementById("mainContent").style.display = "block";
+}
+</script>
 
 </body>
 </html>
