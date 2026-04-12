@@ -12,17 +12,30 @@ body {
   color: white;
   text-align: center;
   margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-h1 { margin-top: 10px; }
+h1 {
+  margin: 10px 0 5px;
+  font-size: 22px;
+}
 
+#score {
+  font-size: 16px;
+  margin-bottom: 5px;
+}
+
+/* TABULEIRO */
 #board {
   display: grid;
-  grid-template-columns: repeat(8, 10vw);
-  grid-template-rows: repeat(8, 10vw);
-  gap: 2px;
-  justify-content: center;
-  margin: 10px auto;
+  grid-template-columns: repeat(8, 1fr);
+  aspect-ratio: 1 / 1;
+  width: 90vw;
+  max-width: 400px;
+  gap: 3px;
+  margin: 10px 0;
 }
 
 .cell {
@@ -34,17 +47,19 @@ h1 { margin-top: 10px; }
   background: #00d4ff;
 }
 
+/* PEÇAS */
 #pieces {
   display: flex;
   justify-content: center;
-  gap: 15px;
-  margin-top: 15px;
-  flex-wrap: wrap;
+  gap: 12px;
+  width: 100%;
+  padding: 10px;
 }
 
 .piece {
-  padding: 5px;
+  padding: 6px;
   border-radius: 8px;
+  background: #1a1a1a;
 }
 
 .piece.selected {
@@ -57,9 +72,22 @@ h1 { margin-top: 10px; }
 }
 
 .block {
-  width: 6vw;
-  height: 6vw;
+  width: 18px;
+  height: 18px;
   background: #00d4ff;
+  border-radius: 2px;
+}
+
+/* TELAS MENORES */
+@media (max-height: 700px) {
+  #board {
+    width: 80vw;
+  }
+
+  .block {
+    width: 14px;
+    height: 14px;
+  }
 }
 </style>
 </head>
@@ -84,7 +112,7 @@ const scoreEl = document.getElementById("score");
 let selectedShape = null;
 let selectedPieceEl = null;
 
-// ---------------- TABULEIRO ----------------
+// TABULEIRO
 function drawBoard() {
   board.innerHTML = "";
 
@@ -126,7 +154,7 @@ function drawBoard() {
   });
 }
 
-// ---------------- LÓGICA ----------------
+// LÓGICA
 function canPlace(shape, x, y) {
   for (let i = 0; i < shape.length; i++) {
     for (let j = 0; j < shape[i].length; j++) {
@@ -155,7 +183,7 @@ function placeShape(shape, x, y) {
   }
 }
 
-// ---------------- LIMPAR ----------------
+// LIMPAR LINHAS
 function checkLines() {
   for (let y = 0; y < size; y++) {
     let full = true;
@@ -188,7 +216,7 @@ function checkLines() {
   }
 }
 
-// ---------------- PEÇAS ----------------
+// PEÇAS
 const shapes = [
   [[1,1,1]],
   [[1,1],[1,1]],
@@ -198,7 +226,7 @@ const shapes = [
   [[1,0,0],[1,1,1]],
 ];
 
-// ---------------- CRIAR PEÇA ----------------
+// CRIAR PEÇA
 function createPiece(shape) {
   const wrapper = document.createElement("div");
   wrapper.className = "piece";
@@ -208,7 +236,7 @@ function createPiece(shape) {
 
   const gridDiv = document.createElement("div");
   gridDiv.className = "piece-grid";
-  gridDiv.style.gridTemplateColumns = `repeat(${cols}, 6vw)`;
+  gridDiv.style.gridTemplateColumns = `repeat(${cols}, 18px)`;
 
   for (let i = 0; i < rows; i++) {
     for (let j = 0; j < cols; j++) {
@@ -217,8 +245,8 @@ function createPiece(shape) {
       if (shape[i][j]) {
         cell.className = "block";
       } else {
-        cell.style.width = "6vw";
-        cell.style.height = "6vw";
+        cell.style.width = "18px";
+        cell.style.height = "18px";
         cell.style.opacity = "0";
       }
 
@@ -228,7 +256,6 @@ function createPiece(shape) {
 
   wrapper.appendChild(gridDiv);
 
-  // 👇 CLICK (FUNCIONA EM CELULAR)
   wrapper.addEventListener("click", () => {
     document.querySelectorAll(".piece").forEach(p => p.classList.remove("selected"));
 
@@ -240,7 +267,7 @@ function createPiece(shape) {
   return wrapper;
 }
 
-// ---------------- CARREGAR ----------------
+// CARREGAR
 function loadPieces() {
   piecesDiv.innerHTML = "";
 
@@ -250,7 +277,7 @@ function loadPieces() {
   }
 }
 
-// ---------------- START ----------------
+// START
 drawBoard();
 loadPieces();
 </script>
